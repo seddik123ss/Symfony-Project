@@ -1,0 +1,157 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Message - {{ message.subject }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .message-detail-wrapper {
+        padding: 2rem 0;
+    }
+
+    .message-detail-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .message-header-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+    }
+
+    .message-subject {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 1rem 0;
+    }
+
+    .message-meta-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        font-size: 0.95rem;
+        opacity: 0.95;
+    }
+
+    .message-body-section {
+        padding: 2.5rem;
+    }
+
+    .message-content {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: #2d3748;
+        white-space: pre-wrap;
+    }
+
+    .message-actions {
+        padding: 1.5rem 2.5rem;
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border: none;
+        color: white;
+    }
+
+    .info-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        display: inline-block;
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="message-detail-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                <div class="message-detail-card">
+                    <div class="message-header-section">
+                        <h2 class="message-subject">{{ message.subject }}</h2>
+                        <div class="message-meta-info">
+                            {% if currentUser.id == message.sender.id %}
+                                <span class="info-badge">
+                                    <i class="fas fa-user me-2"></i>À: {{ message.recipient.fullname }}
+                                </span>
+                                <span class="info-badge">
+                                    <i class="fas fa-envelope me-2"></i>{{ message.recipient.email }}
+                                </span>
+                                {% if message.isRead %}
+                                    <span class="info-badge">
+                                        <i class="fas fa-check-double me-2"></i>Lu
+                                    </span>
+                                {% else %}
+                                    <span class="info-badge">
+                                        <i class="fas fa-check me-2"></i>Non lu
+                                    </span>
+                                {% endif %}
+                            {% else %}
+                                <span class="info-badge">
+                                    <i class="fas fa-user me-2"></i>De: {{ message.sender.fullname }}
+                                </span>
+                                <span class="info-badge">
+                                    <i class="fas fa-envelope me-2"></i>{{ message.sender.email }}
+                                </span>
+                            {% endif %}
+                            <span class="info-badge">
+                                <i class="fas fa-clock me-2"></i>{{ message.createdAt|date('d/m/Y à H:i') }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="message-body-section">
+                        <div class="message-content">{{ message.content }}</div>
+                    </div>
+
+                    <div class="message-actions">
+                        <a href="{{ path('message_index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Retour
+                        </a>
+                        {% if currentUser.id == message.recipient.id %}
+                            <a href="{{ path('message_new') }}?reply_to={{ message.sender.id }}" class="btn btn-primary">
+                                <i class="fas fa-reply me-2"></i>Répondre
+                            </a>
+                            {% endif %}
+                            {% if currentUser.id == message.sender.id %}
+                                <a href="{{ path('message_edit', {id: message.id}) }}" class="btn btn-primary">
+                                    <i class="fas fa-edit me-2"></i>Modifier
+                                </a>
+                        {% endif %}
+                        <form method="post" action="{{ path('message_delete', {id: message.id}) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce message ?')">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ message.id) }}">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

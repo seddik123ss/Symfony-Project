@@ -580,10 +580,16 @@
                         </li>
 
                         <!-- Messages -->
-                        <li class="nav-item">
-                            <a class="nav-link-modern" href="#">
+                        <li class="nav-item position-relative">
+                            <a class="nav-link-modern" href="{{ path('message_index') }}">
                                 <i class="fas fa-envelope"></i>
                                 <span class="d-lg-none">Messages</span>
+                                {% if app.user %}
+                                    {% set unreadCount = unread_messages_count() %}
+                                    {% if unreadCount > 0 %}
+                                        <span class="notification-badge">{{ unreadCount }}</span>
+                                    {% endif %}
+                                {% endif %}
                             </a>
                         </li>
 
@@ -687,6 +693,14 @@
                 <a href="{{ path('reclamation_index_user') }}" class="sidebar-link">
                     <i class="fas fa-exclamation-circle"></i>
                     <span> Mes reclamations</span>
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <h6 class="sidebar-heading">Messages</h6>
+                <a href="{{ path('message_index') }}" class="sidebar-link">
+                    <i class="fas fa-envelope"></i>
+                    <span> Mes Messages</span>
                 </a>
             </div>
         </aside>

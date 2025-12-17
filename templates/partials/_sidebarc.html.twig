@@ -12,6 +12,11 @@
                 <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                 mon compte
             </a>
+
+            <a class="nav-link {{ app.request.attributes.get('_route') starts with 'message' ? 'active' : '' }}" href="{{ path('message_index') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-envelope"></i></div>
+                Mes Messages
+            </a>
         </div>
     </div>
     <div class="sb-sidenav-footer modern-footer">

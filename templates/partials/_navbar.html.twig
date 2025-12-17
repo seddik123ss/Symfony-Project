@@ -328,9 +328,14 @@
             </li>
 
             <li class="nav-item">
-                <a href="#" class="notification-icon" title="Messages">
+                <a href="{{ path('message_index') }}" class="notification-icon" title="Messages">
                     <i class="fas fa-envelope"></i>
-                    <span class="notification-badge">2</span>
+                    {% if app.user %}
+                        {% set unreadCount = unread_messages_count() %}
+                        {% if unreadCount > 0 %}
+                            <span class="notification-badge">{{ unreadCount }}</span>
+                        {% endif %}
+                    {% endif %}
                 </a>
             </li>
 

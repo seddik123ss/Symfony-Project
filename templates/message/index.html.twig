@@ -1,0 +1,484 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Messages{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --sent-bubble: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --received-bubble: #f0f0f0;
+        --chat-bg: #e5ddd5;
+    }
+
+    body {
+        background: var(--chat-bg);
+        min-height: 100vh;
+    }
+
+    .chat-container {
+        display: flex;
+        height: calc(100vh - 120px);
+        max-width: 1400px;
+        margin: 2rem auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    /* Conversation List Sidebar */
+    .conversations-sidebar {
+        width: 350px;
+        border-right: 1px solid #e9ecef;
+        display: flex;
+        flex-direction: column;
+        background: #f8f9fa;
+    }
+
+    .conversations-header {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .conversations-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .conversations-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0.5rem;
+    }
+
+    .conversation-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: white;
+        border: 2px solid transparent;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .conversation-item:hover {
+        background: #f0f0f0;
+        transform: translateX(5px);
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .conversation-item.active {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-color: var(--primary-color);
+    }
+
+    .conversation-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .conversation-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .conversation-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .conversation-preview {
+        font-size: 0.85rem;
+        color: #6c757d;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .conversation-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.25rem;
+    }
+
+    .conversation-time {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .unread-badge {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    /* Chat Area */
+    .chat-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: white;
+    }
+
+    .chat-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .chat-user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .chat-user-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+
+    .chat-user-details h4 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .chat-user-details p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem;
+        background: var(--chat-bg);
+        background-image: 
+            repeating-linear-gradient(0deg, transparent, transparent 35px, rgba(0,0,0,.03) 35px, rgba(0,0,0,.03) 36px);
+    }
+
+    .message-bubble {
+        display: flex;
+        margin-bottom: 1rem;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .message-bubble.sent {
+        justify-content: flex-end;
+    }
+
+    .message-bubble.received {
+        justify-content: flex-start;
+    }
+
+    .bubble-content {
+        max-width: 70%;
+        padding: 0.75rem 1rem;
+        border-radius: 18px;
+        position: relative;
+        word-wrap: break-word;
+    }
+
+    .message-bubble.sent .bubble-content {
+        background: var(--sent-bubble);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .message-bubble.received .bubble-content {
+        background: var(--received-bubble);
+        color: #2c3e50;
+        border-bottom-left-radius: 4px;
+    }
+
+    .bubble-subject {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .bubble-text {
+        line-height: 1.5;
+        font-size: 0.95rem;
+    }
+
+    .bubble-time {
+        font-size: 0.7rem;
+        opacity: 0.7;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .bubble-time i {
+        font-size: 0.6rem;
+    }
+
+    .message-actions {
+        position: absolute;
+        top: 6px;
+        right: 10px;
+        display: flex;
+        gap: 6px;
+    }
+
+    .message-action-btn {
+        background: transparent;
+        border: none;
+        color: rgba(0,0,0,0.6);
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 6px;
+    }
+
+    .message-action-btn:hover { background: rgba(0,0,0,0.04); }
+    
+    .send-email-btn:hover {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+    }
+
+    .chat-input-area {
+        padding: 1.5rem;
+        border-top: 1px solid #e9ecef;
+        background: white;
+    }
+
+    .empty-chat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #6c757d;
+    }
+
+    .empty-chat i {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+
+    .empty-conversations {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+    }
+
+    .empty-conversations i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid px-4">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    <div class="chat-container">
+        <!-- Conversations Sidebar -->
+        <div class="conversations-sidebar">
+            <div class="conversations-header">
+                <h3><i class="fas fa-comments me-2"></i>Messages</h3>
+                <a href="{{ path('message_new') }}" class="text-white" title="Nouveau message">
+                    <i class="fas fa-plus-circle" style="font-size: 1.5rem;"></i>
+                </a>
+            </div>
+            
+            <div class="conversations-list">
+                {% if conversations|length > 0 %}
+                    {% for otherUserId, conversation in conversations %}
+                        <a href="{{ path('message_index', {user: otherUserId}) }}" 
+                           class="conversation-item {{ selectedConversation and selectedConversation.user.id == otherUserId ? 'active' : '' }}">
+                            <div class="conversation-avatar">
+                                {{ conversation.user.fullname|first|upper }}
+                            </div>
+                            <div class="conversation-info">
+                                <div class="conversation-name">{{ conversation.user.fullname }}</div>
+                                <div class="conversation-preview">
+                                    {{ conversation.lastMessage.subject }}: {{ conversation.lastMessage.content|slice(0, 30) }}{{ conversation.lastMessage.content|length > 30 ? '...' : '' }}
+                                </div>
+                            </div>
+                            <div class="conversation-meta">
+                                <div class="conversation-time">
+                                    {{ conversation.lastMessage.createdAt|date('d/m H:i') }}
+                                </div>
+                                {% if conversation.unreadCount > 0 %}
+                                    <div class="unread-badge">{{ conversation.unreadCount }}</div>
+                                {% endif %}
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-conversations">
+                        <i class="fas fa-inbox"></i>
+                        <p>Aucune conversation</p>
+                        <a href="{{ path('message_new') }}" class="btn btn-primary mt-3">
+                            <i class="fas fa-plus me-2"></i>Nouveau message
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            {% if selectedConversation %}
+                <div class="chat-header">
+                    <div class="chat-user-info">
+                        <div class="chat-user-avatar">
+                            {{ selectedConversation.user.fullname|first|upper }}
+                        </div>
+                        <div class="chat-user-details">
+                            <h4>{{ selectedConversation.user.fullname }}</h4>
+                            <p>{{ selectedConversation.user.email }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    {% for msg in conversationMessages %}
+                        <div class="message-bubble {{ msg.sender.id == app.user.id ? 'sent' : 'received' }}">
+                            <div class="bubble-content">
+                                {% if msg.subject %}
+                                    <div class="bubble-subject">{{ msg.subject }}</div>
+                                {% endif %}
+                                <div class="bubble-text">{{ msg.content }}</div>
+                                <div class="bubble-time">
+                                    <i class="fas fa-clock"></i>
+                                    {{ msg.createdAt|date('d/m/Y H:i') }}
+                                    {% if msg.sender.id == app.user.id %}
+                                        {% if msg.isRead %}
+                                            <i class="fas fa-check-double ms-2" style="opacity: 0.7;"></i>
+                                        {% else %}
+                                            <i class="fas fa-check ms-2" style="opacity: 0.7;"></i>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                <div class="message-actions">
+                                    {% if msg.sender.id == app.user.id %}
+                                        <a href="{{ path('message_edit', {id: msg.id}) }}" class="message-action-btn" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    {% endif %}
+
+                                    <form method="post" action="{{ path('message_send_email', {id: msg.id}) }}" style="display:inline;" onsubmit="return confirm('Envoyer ce message par email à {{ msg.recipient.email }} ?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('send_email' ~ msg.id) }}">
+                                        <button class="message-action-btn send-email-btn" title="Envoyer par email à {{ msg.recipient.email }}" type="submit">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                    </form>
+
+                                    <form method="post" action="{{ path('message_delete', {id: msg.id}) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce message ?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ msg.id) }}">
+                                        <button class="message-action-btn text-danger" title="Supprimer" type="submit">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="chat-input-area">
+                    <a href="{{ path('message_new', {recipient: selectedConversation.user.id}) }}" class="btn btn-primary w-100" style="background: var(--sent-bubble); border: none;">
+                        <i class="fas fa-paper-plane me-2"></i>Envoyer un message
+                    </a>
+                </div>
+            {% else %}
+                <div class="empty-chat">
+                    <i class="fas fa-comments"></i>
+                    <h3>Sélectionnez une conversation</h3>
+                    <p class="text-muted">Choisissez une conversation dans la liste pour commencer à chatter</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    // Auto-scroll to bottom of chat
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+</script>
+{% endblock %}
+
+
+

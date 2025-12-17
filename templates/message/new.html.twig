@@ -1,0 +1,307 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Message{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .message-wrapper {
+        padding: 2rem 0;
+    }
+
+    .message-form-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background: white;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2.5rem 2rem;
+        text-align: center;
+    }
+
+    .form-header i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+    }
+
+    .form-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .form-body {
+        padding: 2.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.6rem;
+    }
+
+    .form-control, 
+    .form-select {
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, 
+    .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        outline: none;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 200px;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 0.875rem 2.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .btn-cancel {
+        border: 2px solid #cbd5e0;
+        color: #4a5568;
+        background: white;
+        padding: 0.875rem 2.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Validation error styles */
+    .form-error {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .form-control.is-invalid,
+    .form-select.is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+    }
+
+    .invalid-feedback {
+        display: block;
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    .char-counter {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+
+    .char-counter.warning {
+        color: #ffc107;
+    }
+
+    .char-counter.danger {
+        color: #dc3545;
+    }
+
+    .js-error {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="message-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+
+                <div class="message-form-card">
+                    <div class="form-header">
+                        <i class="fas fa-paper-plane"></i>
+                        <h1>Nouveau Message</h1>
+                        <p class="mb-0">Envoyez un message à un utilisateur</p>
+                    </div>
+
+                    <div class="form-body">
+                        {{ form_start(form) }}
+
+                        <div class="mb-4">
+                            {{ form_label(form.recipient, 'Destinataire', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.recipient, {'attr': {'class': form_errors(form.recipient) ? 'form-select is-invalid' : 'form-select'}}) }}
+                            {% if form_errors(form.recipient) %}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.recipient) }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form_label(form.subject, 'Sujet (max 20 caractères)', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.subject, {'attr': {'class': form_errors(form.subject) ? 'form-control is-invalid' : 'form-control', 'placeholder': 'Entrez le sujet du message', 'maxlength': '20', 'id': 'message_subject'}}) }}
+                            <div class="char-counter" id="subject-counter">0/20 caractères</div>
+                            <div class="js-error" id="subject-error"></div>
+                            {% if form_errors(form.subject) %}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.subject) }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form_label(form.content, 'Message', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.content, {'attr': {'class': form_errors(form.content) ? 'form-control is-invalid' : 'form-control', 'rows': '10', 'placeholder': 'Écrivez votre message ici...', 'id': 'message_content'}}) }}
+                            <div class="js-error" id="content-error"></div>
+                            {% if form_errors(form.content) %}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.content) }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex gap-3 justify-content-end">
+                            <a href="{{ path('message_index') }}" class="btn btn-cancel">
+                                <i class="fas fa-times me-2"></i>Annuler
+                            </a>
+                            <button type="submit" class="btn btn-submit">
+                                <i class="fas fa-paper-plane me-2"></i>Envoyer
+                            </button>
+                        </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const subjectField = document.getElementById('message_subject');
+    const contentField = document.getElementById('message_content');
+    const subjectCounter = document.getElementById('subject-counter');
+    const subjectError = document.getElementById('subject-error');
+    const contentError = document.getElementById('content-error');
+    const form = document.querySelector('form');
+    const submitBtn = document.querySelector('.btn-submit');
+
+    // Subject validation
+    function validateSubject() {
+        const value = subjectField.value.trim();
+        const length = value.length;
+        
+        // Update counter
+        subjectCounter.textContent = `${length}/20 caractères`;
+        
+        // Remove existing classes
+        subjectCounter.classList.remove('warning', 'danger');
+        subjectField.classList.remove('is-invalid');
+        subjectError.style.display = 'none';
+        
+        if (length === 0) {
+            subjectField.classList.add('is-invalid');
+            subjectError.textContent = 'Le sujet est obligatoire';
+            subjectError.style.display = 'block';
+            return false;
+        } else if (length > 20) {
+            subjectField.classList.add('is-invalid');
+            subjectCounter.classList.add('danger');
+            subjectError.textContent = 'Le sujet ne peut pas dépasser 20 caractères';
+            subjectError.style.display = 'block';
+            return false;
+        } else if (length > 15) {
+            subjectCounter.classList.add('warning');
+        }
+        
+        return true;
+    }
+
+    // Content validation
+    function validateContent() {
+        const value = contentField.value.trim();
+        
+        contentField.classList.remove('is-invalid');
+        contentError.style.display = 'none';
+        
+        if (value.length === 0) {
+            contentField.classList.add('is-invalid');
+            contentError.textContent = 'Le contenu du message est obligatoire';
+            contentError.style.display = 'block';
+            return false;
+        }
+        
+        return true;
+    }
+
+    // Real-time validation
+    subjectField.addEventListener('input', validateSubject);
+    subjectField.addEventListener('blur', validateSubject);
+    contentField.addEventListener('input', validateContent);
+    contentField.addEventListener('blur', validateContent);
+
+    // Form submission validation
+    form.addEventListener('submit', function(e) {
+        const isSubjectValid = validateSubject();
+        const isContentValid = validateContent();
+        
+        if (!isSubjectValid || !isContentValid) {
+            e.preventDefault();
+            
+            // Scroll to first error
+            const firstError = document.querySelector('.is-invalid');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+        }
+    });
+
+    // Initialize counter
+    validateSubject();
+});
+</script>
+{% endblock %}
+
+
+
