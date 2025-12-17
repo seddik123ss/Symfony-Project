@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            background: #f7fafc;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .success-icon {
+            text-align: center;
+            font-size: 60px;
+            color: #198754;
+            margin: 20px 0;
+        }
+        .info-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #2d3748;
+        }
+        .info-item {
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-item strong {
+            color: #4a5568;
+            display: inline-block;
+            width: 150px;
+        }
+        .amount-highlight {
+            background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .amount-highlight .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        .amount-highlight .value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .pickup-info {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .pickup-info h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+        .pickup-info p {
+            color: #856404;
+            margin: 8px 0;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            color: #718096;
+            font-size: 12px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>✓ Achat Confirmé !</h1>
+        <p>Merci pour votre achat sur ArtEdu</p>
+    </div>
+
+    <div class="content">
+        <div class="success-icon">✓</div>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <h2 style="color: #2d3748;">Félicitations {{ clientName }} !</h2>
+            <p style="color: #4a5568; font-size: 16px;">Votre achat a été confirmé avec succès.</p>
+        </div>
+
+        <div class="info-box">
+            <h3>Détails de votre achat</h3>
+            <div class="info-item">
+                <strong>Œuvre :</strong> {{ sale.title }}
+            </div>
+            <div class="info-item">
+                <strong>Type :</strong> {{ sale.type.value|upper }}
+            </div>
+            {% if sale.description %}
+            <div class="info-item">
+                <strong>Description :</strong> {{ sale.description|slice(0, 100) }}{% if sale.description|length > 100 %}...{% endif %}
+            </div>
+            {% endif %}
+            <div class="info-item">
+                <strong>Date d'achat :</strong> {{ "now"|date('d/m/Y à H:i') }}
+            </div>
+        </div>
+
+        <div class="amount-highlight">
+            <div class="label">Montant payé</div>
+            <div class="value">{{ amount|number_format(2, ',', ' ') }} €</div>
+        </div>
+
+        <div class="pickup-info">
+            <h3>📍 Récupération de votre œuvre</h3>
+            <p><strong>Vous pouvez venir récupérer votre œuvre à notre galerie.</strong></p>
+            {% if sale.location %}
+            <p><strong>Adresse :</strong> {{ sale.location }}</p>
+            {% endif %}
+            {% if sale.contactInfo %}
+            <p><strong>Contact :</strong> {{ sale.contactInfo }}</p>
+            {% endif %}
+            <p style="margin-top: 15px;"><em>Merci de vous munir de votre pièce d'identité et de cette confirmation lors de la récupération.</em></p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <p style="color: #4a5568; margin-bottom: 15px;">
+                <strong>Votre facture a été générée et est jointe à cet email.</strong>
+            </p>
+            <p style="color: #718096; font-size: 14px;">
+                Vous pouvez également télécharger la facture depuis votre compte ou la retrouver dans vos emails.
+            </p>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="{{ absolute_url(path('app_sale_details', {'id': sale.id})) }}" class="button">
+                Voir les détails de l'œuvre
+            </a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>ArtEdu - Galerie d'Art en Ligne</strong></p>
+        <p>Merci de votre confiance !</p>
+        <p>Pour toute question, n'hésitez pas à nous contacter.</p>
+    </div>
+</body>
+</html>
+

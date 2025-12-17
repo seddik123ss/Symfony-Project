@@ -1,0 +1,62 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    # Module Sale - Configuration
+    sale.image_upload_directory: '%kernel.project_dir%/public/uploads/sales'
+    sale.mailer.from_email: 'hadjamorrached@gmail.com' # Peut être surchargé via MAILER_FROM_EMAIL dans .env
+    sale.mailer.dsn: '%env(MAILER_DSN)%'
+    
+    # Module Payment - Configuration
+    payment.stripe.secret_key: '%env(STRIPE_SECRET_KEY)%'
+    payment.stripe.public_key: '%env(STRIPE_PUBLIC_KEY)%'
+    
+    # Paramètres de compatibilité (pour migration progressive)
+    sale_image_upload_directory: '%sale.image_upload_directory%'
+    mailer_from_email: '%sale.mailer.from_email%'
+    stripe_secret_key: '%payment.stripe.secret_key%'
+    stripe_public_key: '%payment.stripe.public_key%'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Service/Interface/'
+
+    # Services personnalisés - Module Sale
+    App\Service\SaleImageUploader:
+        arguments:
+            $targetDirectory: '%sale.image_upload_directory%'
+
+    # Service Mailer pour le module Sale
+    App\Service\Sale\SaleMailerService:
+        arguments:
+            $fromEmail: '%sale.mailer.from_email%'
+
+    # Alias pour compatibilité avec l'ancien MailerService
+    App\Service\MailerService:
+        alias: App\Service\Sale\SaleMailerService
+        public: true
+
+    App\Service\PaymentService:
+        arguments:
+            $stripeSecretKey: '%payment.stripe.secret_key%'
+
+    App\Service\InvoiceService:
+        arguments:
+            $kernelProjectDir: '%kernel.project_dir%'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones

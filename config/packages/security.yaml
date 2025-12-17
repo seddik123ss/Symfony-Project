@@ -1,0 +1,44 @@
+security:
+    # Password hashing
+    password_hashers:
+        App\Entity\Users:
+            algorithm: plaintext
+
+    # User provider (base de données)
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\Users
+                property: email
+
+    # Firewalls
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            lazy: true
+            provider: app_user_provider
+            custom_authenticator: App\Security\AppCustomAuthenticator
+            logout:
+                path: app_logout
+                target: /welcome   # ← redirection après logout
+
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+                # always_remember_me: true   # optionnel
+
+    # Access control
+    access_control:
+        # - { path: ^/admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }
+
+# Configuration spécifique pour l'environnement test (optionnel)
+when@test:
+    security:
+        password_hashers:
+            App\Entity\Users:
+                algorithm: plaintext

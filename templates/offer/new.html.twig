@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faire une offre - {{ sale.title }} - ArtEdu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .offer-container {
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            margin-bottom: 30px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #667eea;
+        }
+
+        .sale-header {
+            margin-bottom: 40px;
+        }
+
+        .sale-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sale-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .meta-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .badge-status {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .badge-type {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .badge-price {
+            background: rgba(25, 135, 84, 0.2);
+            color: #20c997;
+            border: 1px solid rgba(25, 135, 84, 0.3);
+        }
+
+        .sale-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 968px) {
+            .sale-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .gallery-section {
+            position: relative;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .swiper {
+            width: 100%;
+            height: 500px;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: #667eea;
+        }
+
+        .swiper-pagination-bullet-active {
+            background: #667eea;
+        }
+
+        .info-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .info-item i {
+            color: #667eea;
+            width: 20px;
+        }
+
+        .price-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #20c997;
+            margin: 20px 0;
+        }
+
+        .offer-form-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .offer-form-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: #ffffff;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 12px 15px;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #667eea;
+            color: #ffffff;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-secondary-custom {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 30px;
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary-custom:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+
+        .input-group-text {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-text {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .invalid-feedback {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="offer-container">
+        <a href="{{ path('app_sale_details', {'id': sale.id}) }}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Retour aux détails de la vente
+        </a>
+
+        <div class="sale-header">
+            <h1 class="sale-title">{{ sale.title }}</h1>
+            <div class="sale-meta">
+                <span class="meta-badge badge-status">{{ sale.status.value|upper }}</span>
+                <span class="meta-badge badge-type">{{ sale.type.value|upper }}</span>
+                {% if sale.amount %}
+                    <span class="meta-badge badge-price">{{ sale.amount|number_format(2, ',', ' ') }} €</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="sale-content">
+            <!-- Galerie d'images -->
+            <div class="gallery-section">
+                {% if images|length > 0 %}
+                    <div class="swiper">
+                        <div class="swiper-wrapper">
+                            {% for image in images %}
+                                <div class="swiper-slide">
+                                    <img src="{{ asset(image.path) }}" alt="{{ sale.title }}">
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                {% elseif sale.image %}
+                    <img src="{{ asset(sale.image) }}" alt="{{ sale.title }}" class="main-image">
+                {% else %}
+                    <div class="main-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-image" style="font-size: 4rem; opacity: 0.3;"></i>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Informations de la vente -->
+            <div class="info-section">
+                <h3>Détails de l'œuvre</h3>
+                
+                {% if sale.description %}
+                    <div class="description">{{ sale.description|nl2br }}</div>
+                {% endif %}
+
+                {% if sale.amount %}
+                    <div class="price-display">{{ sale.amount|number_format(2, ',', ' ') }} €</div>
+                {% endif %}
+
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ sale.location ?: 'Non spécifié' }}</span>
+                </div>
+
+                {% if sale.contactInfo %}
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ sale.contactInfo }}</span>
+                    </div>
+                {% endif %}
+
+                <div class="info-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Publié le {{ sale.createdAt|date('d/m/Y') }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire d'offre -->
+        <div class="offer-form-section">
+            <h3><i class="fas fa-hand-holding-usd"></i> Faire une offre</h3>
+            
+            {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': true}}) }}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.clientName, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.clientName, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.clientName) }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    {{ form_label(form.clientEmail, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.clientEmail, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.clientEmail) }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.clientPhone, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.clientPhone, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.clientPhone) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.offeredAmount, null, {'label_attr': {'class': 'form-label'}}) }}
+                <div class="input-group">
+                    {{ form_widget(form.offeredAmount, {'attr': {'class': 'form-control'}}) }}
+                    <span class="input-group-text">€</span>
+                </div>
+                {{ form_errors(form.offeredAmount) }}
+                {% if sale.amount %}
+                    <small class="form-text">Prix demandé : <strong>{{ sale.amount|number_format(2, ',', ' ') }} €</strong></small>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.message, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.message, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+                {{ form_errors(form.message) }}
+            </div>
+
+            <div class="d-flex gap-3 justify-content-end">
+                <a href="{{ path('app_sale_details', {'id': sale.id}) }}" class="btn-secondary-custom">Annuler</a>
+                <button type="submit" class="btn-primary-custom">
+                    <i class="fas fa-paper-plane"></i> Envoyer l'offre
+                </button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        {% if images|length > 1 %}
+        const swiper = new Swiper('.swiper', {
+            loop: true,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+        });
+        {% endif %}
+    </script>
+</body>
+</html>

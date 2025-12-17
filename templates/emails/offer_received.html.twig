@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle offre reçue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .offer-details {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .offer-details h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        .offer-details p {
+            margin: 10px 0;
+        }
+        .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #198754;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎨 Nouvelle offre reçue</h1>
+    </div>
+    <div class="content">
+        <p>Bonjour,</p>
+        <p>Vous avez reçu une nouvelle offre pour votre œuvre : <strong>{{ sale.title }}</strong></p>
+        
+        <div class="offer-details">
+            <h3>Détails de l'offre</h3>
+            <p><strong>Client :</strong> {{ offer.clientName }}</p>
+            <p><strong>Email :</strong> {{ offer.clientEmail }}</p>
+            {% if offer.clientPhone %}
+                <p><strong>Téléphone :</strong> {{ offer.clientPhone }}</p>
+            {% endif %}
+            <p><strong>Montant offert :</strong> <span class="amount">{{ offer.offeredAmount|number_format(2, ',', ' ') }} €</span></p>
+            <p><strong>Message :</strong></p>
+            <p style="background: #f0f0f0; padding: 15px; border-radius: 5px;">{{ offer.message }}</p>
+        </div>
+
+        <p>Vous pouvez accepter, refuser ou négocier cette offre en vous connectant à votre espace.</p>
+        
+        <a href="{{ absolute_url(path('app_sale_details', {'id': sale.id})) }}" class="button">Voir l'offre</a>
+    </div>
+    <div class="footer">
+        <p>ArtEdu - Galerie d'Art Contemporain</p>
+        <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+    </div>
+</body>
+</html>
+

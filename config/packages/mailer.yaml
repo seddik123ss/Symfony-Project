@@ -1,0 +1,8 @@
+framework:
+    mailer:
+        dsn: '%env(MAILER_DSN)%'
+        # Configuration pour transports multiples (optionnel)
+        # Pour utiliser des transports séparés par module, décommentez :
+        # transports:
+        #     default: '%env(MAILER_DSN)%'
+        #     sale: '%env(MAILER_DSN)%'  # Utilise le même DSN pour le module Sale

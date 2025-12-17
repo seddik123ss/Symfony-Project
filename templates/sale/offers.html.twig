@@ -1,0 +1,627 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Offres - {{ sale.title }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    #layoutSidenav_content {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 0;
+    }
+
+    .offers-management-container {
+        width: 100%;
+        min-height: 100vh;
+        padding: 40px 20px;
+    }
+
+    .offers-header {
+        max-width: 1400px;
+        margin: 0 auto 40px;
+        color: white;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+        margin-bottom: 30px;
+        transition: color 0.3s ease;
+        font-weight: 500;
+    }
+
+    .back-link:hover {
+        color: white;
+    }
+
+    .sale-info-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .sale-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 15px;
+    }
+
+    .sale-meta {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .meta-badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .offers-content {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .offers-section {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        color: #2d3748;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title .badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .offer-card {
+        background: #f7fafc;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        border: 2px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .offer-card:hover {
+        border-color: #667eea;
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .offer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .offer-amount-section {
+        flex: 1;
+    }
+
+    .offer-amount {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #20c997;
+        margin-bottom: 5px;
+    }
+
+    .offer-vendor-amount {
+        font-size: 1.3rem;
+        color: #667eea;
+        margin-top: 5px;
+    }
+
+    .offer-status-badges {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-pending {
+        background: rgba(255, 193, 7, 0.2);
+        color: #f59e0b;
+    }
+
+    .status-negotiating {
+        background: rgba(102, 126, 234, 0.2);
+        color: #667eea;
+    }
+
+    .status-accepted {
+        background: rgba(25, 135, 84, 0.2);
+        color: #198754;
+    }
+
+    .status-refused {
+        background: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+    }
+
+    .status-final {
+        background: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+    }
+
+    .offer-info {
+        color: #4a5568;
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+
+    .offer-info strong {
+        color: #2d3748;
+    }
+
+    .offer-message {
+        background: white;
+        border-left: 4px solid #667eea;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+        color: #4a5568;
+        font-style: italic;
+    }
+
+    .offer-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-action {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-accept {
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        color: white;
+    }
+
+    .btn-accept:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(25, 135, 84, 0.4);
+        color: white;
+    }
+
+    .btn-refuse {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+    }
+
+    .btn-refuse:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        color: white;
+    }
+
+    .btn-negotiate {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-negotiate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .btn-view {
+        background: #e2e8f0;
+        color: #4a5568;
+    }
+
+    .btn-view:hover {
+        background: #cbd5e0;
+        color: #2d3748;
+    }
+
+    .negotiate-form {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 15px;
+        border: 2px solid #667eea;
+    }
+
+    .negotiate-form input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .negotiate-form input:focus {
+        border-color: #667eea;
+        outline: none;
+    }
+
+    .no-offers {
+        text-align: center;
+        padding: 60px 20px;
+        color: #718096;
+    }
+
+    .no-offers i {
+        font-size: 4rem;
+        opacity: 0.3;
+        margin-bottom: 20px;
+    }
+
+    .acceptance-status {
+        display: flex;
+        gap: 20px;
+        margin-top: 15px;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+    }
+
+    .acceptance-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .acceptance-item i {
+        font-size: 1.2rem;
+    }
+
+    .accepted {
+        color: #198754;
+    }
+
+    .not-accepted {
+        color: #718096;
+    }
+
+    .offer-date {
+        font-size: 0.85rem;
+        color: #a0aec0;
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="offers-management-container">
+    <div class="offers-header">
+        <a href="{{ path('app_sale_details', {'id': sale.id}) }}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Retour aux détails de la vente
+        </a>
+
+        <div class="sale-info-card">
+            <h1 class="sale-title">{{ sale.title }}</h1>
+            <div class="sale-meta">
+                <span class="meta-badge">{{ sale.status.value|upper }}</span>
+                <span class="meta-badge">{{ sale.type.value|upper }}</span>
+                {% if sale.amount %}
+                    <span class="meta-badge">{{ sale.amount|number_format(2, ',', ' ') }} €</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="offers-content">
+        <!-- Offres en attente -->
+        {% if pendingOffers|length > 0 %}
+        <div class="offers-section">
+            <h2 class="section-title">
+                <i class="fas fa-clock"></i>
+                Offres en attente
+                <span class="badge">{{ pendingOffers|length }}</span>
+            </h2>
+
+            {% for offer in pendingOffers %}
+                <div class="offer-card">
+                    <div class="offer-header">
+                        <div class="offer-amount-section">
+                            <div class="offer-amount">{{ offer.offeredAmount|number_format(2, ',', ' ') }} €</div>
+                            {% if sale.amount %}
+                                <small style="color: #718096;">Prix demandé : {{ sale.amount|number_format(2, ',', ' ') }} €</small>
+                            {% endif %}
+                        </div>
+                        <div class="offer-status-badges">
+                            <span class="status-badge status-pending">EN ATTENTE</span>
+                            {% if offer.isFinalOffer %}
+                                <span class="status-badge status-final">
+                                    <i class="fas fa-lock"></i> FINALE
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="offer-info">
+                        <strong>Client :</strong> {{ offer.clientName }}<br>
+                        <strong>Email :</strong> {{ offer.clientEmail }}<br>
+                        {% if offer.clientPhone %}
+                            <strong>Téléphone :</strong> {{ offer.clientPhone }}<br>
+                        {% endif %}
+                    </div>
+
+                    {% if offer.message %}
+                        <div class="offer-message">
+                            <strong>Message :</strong><br>
+                            {{ offer.message|nl2br }}
+                        </div>
+                    {% endif %}
+
+                    <div class="offer-date">
+                        <i class="fas fa-calendar"></i> Reçue le {{ offer.createdAt|date('d/m/Y à H:i') }}
+                    </div>
+
+                    <div class="offer-actions">
+                        <form method="post" action="{{ path('app_offer_accept', {'id': offer.id}) }}" style="display: inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('accept' ~ offer.id) }}">
+                            <input type="hidden" name="vendor_email" value="{{ sale.contactInfo }}">
+                            <button type="submit" class="btn-action btn-accept">
+                                <i class="fas fa-check"></i> Accepter
+                            </button>
+                        </form>
+
+                        <form method="post" action="{{ path('app_offer_refuse', {'id': offer.id}) }}" style="display: inline;">
+                            <input type="hidden" name="_token" value="{{ csrf_token('refuse' ~ offer.id) }}">
+                            <button type="submit" class="btn-action btn-refuse">
+                                <i class="fas fa-times"></i> Refuser
+                            </button>
+                        </form>
+
+                        {% if not offer.isFinalOffer %}
+                            <button type="button" class="btn-action btn-negotiate" onclick="showNegotiateForm({{ offer.id }})">
+                                <i class="fas fa-handshake"></i> Négocier
+                            </button>
+                        {% endif %}
+
+                        <a href="{{ path('app_offer_show', {'id': offer.id}) }}" class="btn-action btn-view">
+                            <i class="fas fa-eye"></i> Voir détails
+                        </a>
+                    </div>
+
+                    <!-- Formulaire de négociation (caché par défaut) -->
+                    <div id="negotiate-form-{{ offer.id }}" class="negotiate-form" style="display: none;">
+                        <h4 style="margin-bottom: 15px; color: #2d3748;">Proposer un montant</h4>
+                        <form method="post" action="{{ path('app_offer_negotiate', {'id': offer.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('negotiate' ~ offer.id) }}">
+                            <input type="number" name="vendor_amount" step="0.01" min="0.01" 
+                                   placeholder="Montant proposé (€)" required 
+                                   value="{{ offer.vendorAmount ?? offer.offeredAmount }}">
+                            <div style="display: flex; gap: 10px;">
+                                <button type="submit" class="btn-action btn-negotiate" style="flex: 1;">
+                                    <i class="fas fa-paper-plane"></i> Envoyer
+                                </button>
+                                <button type="button" class="btn-action btn-view" onclick="hideNegotiateForm({{ offer.id }})" style="flex: 1;">
+                                    Annuler
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Offres en négociation -->
+        {% if negotiatingOffers|length > 0 %}
+        <div class="offers-section">
+            <h2 class="section-title">
+                <i class="fas fa-handshake"></i>
+                En négociation
+                <span class="badge">{{ negotiatingOffers|length }}</span>
+            </h2>
+
+            {% for offer in negotiatingOffers %}
+                <div class="offer-card">
+                    <div class="offer-header">
+                        <div class="offer-amount-section">
+                            <div class="offer-amount">{{ offer.offeredAmount|number_format(2, ',', ' ') }} €</div>
+                            {% if offer.vendorAmount %}
+                                <div class="offer-vendor-amount">
+                                    <i class="fas fa-arrow-right"></i> Votre contre-offre : {{ offer.vendorAmount|number_format(2, ',', ' ') }} €
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="offer-status-badges">
+                            <span class="status-badge status-negotiating">EN NÉGOCIATION</span>
+                        </div>
+                    </div>
+
+                    <div class="offer-info">
+                        <strong>Client :</strong> {{ offer.clientName }} ({{ offer.clientEmail }})
+                    </div>
+
+                    <div class="acceptance-status">
+                        <div class="acceptance-item">
+                            <i class="fas fa-{{ offer.clientAccepted ? 'check-circle accepted' : 'times-circle not-accepted' }}"></i>
+                            <span>Client : {{ offer.clientAccepted ? 'Accepté' : 'En attente' }}</span>
+                        </div>
+                        <div class="acceptance-item">
+                            <i class="fas fa-{{ offer.vendorAccepted ? 'check-circle accepted' : 'times-circle not-accepted' }}"></i>
+                            <span>Vous : {{ offer.vendorAccepted ? 'Accepté' : 'En attente' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="offer-actions">
+                        {% if not offer.vendorAccepted %}
+                            <form method="post" action="{{ path('app_offer_accept', {'id': offer.id}) }}" style="display: inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('accept' ~ offer.id) }}">
+                                <input type="hidden" name="vendor_email" value="{{ sale.contactInfo }}">
+                                <button type="submit" class="btn-action btn-accept">
+                                    <i class="fas fa-check"></i> Accepter la contre-offre
+                                </button>
+                            </form>
+                        {% endif %}
+
+                        <a href="{{ path('app_offer_show', {'id': offer.id}) }}" class="btn-action btn-view">
+                            <i class="fas fa-eye"></i> Voir détails
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Offres acceptées -->
+        {% if acceptedOffers|length > 0 %}
+        <div class="offers-section">
+            <h2 class="section-title">
+                <i class="fas fa-check-circle"></i>
+                Offres acceptées
+                <span class="badge">{{ acceptedOffers|length }}</span>
+            </h2>
+
+            {% for offer in acceptedOffers %}
+                <div class="offer-card" style="border-color: #20c997;">
+                    <div class="offer-header">
+                        <div class="offer-amount-section">
+                            <div class="offer-amount" style="color: #198754;">
+                                {{ (offer.vendorAmount ?? offer.offeredAmount)|number_format(2, ',', ' ') }} €
+                            </div>
+                        </div>
+                        <div class="offer-status-badges">
+                            <span class="status-badge status-accepted">ACCEPTÉE</span>
+                        </div>
+                    </div>
+
+                    <div class="offer-info">
+                        <strong>Client :</strong> {{ offer.clientName }} ({{ offer.clientEmail }})
+                    </div>
+
+                    <div class="acceptance-status">
+                        <div class="acceptance-item">
+                            <i class="fas fa-check-circle accepted"></i>
+                            <span>Acceptation mutuelle confirmée</span>
+                        </div>
+                    </div>
+
+                    <div class="offer-actions">
+                        <a href="{{ path('app_offer_show', {'id': offer.id}) }}" class="btn-action btn-view">
+                            <i class="fas fa-eye"></i> Voir détails
+                        </a>
+                        <a href="{{ path('app_sale_details', {'id': sale.id}) }}" class="btn-action btn-accept">
+                            <i class="fas fa-credit-card"></i> Gérer le paiement
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Offres refusées -->
+        {% if refusedOffers|length > 0 %}
+        <div class="offers-section">
+            <h2 class="section-title">
+                <i class="fas fa-times-circle"></i>
+                Offres refusées
+                <span class="badge">{{ refusedOffers|length }}</span>
+            </h2>
+
+            {% for offer in refusedOffers %}
+                <div class="offer-card" style="opacity: 0.7;">
+                    <div class="offer-header">
+                        <div class="offer-amount-section">
+                            <div class="offer-amount" style="color: #718096;">
+                                {{ offer.offeredAmount|number_format(2, ',', ' ') }} €
+                            </div>
+                        </div>
+                        <div class="offer-status-badges">
+                            <span class="status-badge status-refused">REFUSÉE</span>
+                        </div>
+                    </div>
+
+                    <div class="offer-info">
+                        <strong>Client :</strong> {{ offer.clientName }} ({{ offer.clientEmail }})
+                    </div>
+
+                    {% if offer.adminMessage %}
+                        <div class="offer-message" style="border-left-color: #dc3545;">
+                            <strong>Raison :</strong><br>
+                            {{ offer.adminMessage|nl2br }}
+                        </div>
+                    {% endif %}
+
+                    <div class="offer-actions">
+                        <a href="{{ path('app_offer_show', {'id': offer.id}) }}" class="btn-action btn-view">
+                            <i class="fas fa-eye"></i> Voir détails
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Aucune offre -->
+        {% if offers|length == 0 %}
+        <div class="offers-section">
+            <div class="no-offers">
+                <i class="fas fa-inbox"></i>
+                <h3 style="color: #4a5568; margin-bottom: 10px;">Aucune offre reçue</h3>
+                <p style="color: #718096;">Cette vente n'a pas encore reçu d'offres.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function showNegotiateForm(offerId) {
+    document.getElementById('negotiate-form-' + offerId).style.display = 'block';
+}
+
+function hideNegotiateForm(offerId) {
+    document.getElementById('negotiate-form-' + offerId).style.display = 'none';
+}
+</script>
+{% endblock %}
+
